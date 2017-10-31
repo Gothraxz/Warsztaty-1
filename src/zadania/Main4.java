@@ -36,8 +36,37 @@ package zadania;
 public class Main4 {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		
+		String[] dice = {"D3", "D4", "D6", "D8", "D10", "D12", "D20", "D100"};
+		int x = 1;
+		int y = 0;
+		int z = 0;
+		char mod = '+';
+		
+		System.out.println(DiceCode(2, 3, 1, '+')); // test generatora kodu
+	}
+	
+	public static String DiceCode(int x, int y, int z, char mod) {
+		// generuje kod rzutu - działa
+		StringBuffer generator = new StringBuffer();
+		
+		if (x > 1) {
+			generator.append(x);
+		}
+		
+		generator.append('D');
+		generator.append(y);
+		
+		if (z != 0) {
+			generator.append(mod);
+			generator.append(z);
+		}
+		String result = generator.toString();
+		return result;
 	}
 
+	public static int DiceThrow(String input) {
+		// czyta kod i zwraca wnik rzutu
+		return 0;
+	}
 }

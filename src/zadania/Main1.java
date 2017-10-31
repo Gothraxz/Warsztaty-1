@@ -70,7 +70,7 @@ public class Main1 {
 		int guess = 0;
 		
 		while (!scan.hasNextInt()) {
-			System.out.println("Wprowadzono niedozowlne znaki, spróbuj ponownie: ");
+			System.out.println("Wprowadzono niedozwolne znaki, spróbuj ponownie: ");
 			scan.next();
 		}
 		return guess = scan.nextInt();
