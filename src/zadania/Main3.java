@@ -27,12 +27,12 @@ public class Main3 {
 			System.out.println("Poza zakresem!");
 			playerChoice = scannerV1();	
 		}
-		
+
 		while (cpuTries > 0) {
 			System.out.println("Wprowadź wskazówkę z poniższej listy:\nZa mało, Za dużo, Trafiłeś");
 			int temp = cpuTry(range[0], range[1]);
-			if (range[0] == playerChoice && range[1] == playerChoice) {
-				System.out.println("CPU wygrało!"); // wykoleja się przy trafieniu wyniku
+			if (range[0] == range[1]) {
+				System.out.println("CPU wygrało!");
 				break;
 			} else {
 				range = cpuRange(scanTextV2(), range, temp);
@@ -40,11 +40,15 @@ public class Main3 {
 			}
 			cpuTries--;
 			System.out.println("Pozostało prób: " + cpuTries);
+			if (cpuTries == 0 && ((playerChoice > range[0] && playerChoice < range[1]) 
+					|| (range[0] != range[1]))) {
+				System.out.println("Gracz wygrał uczciwie");
+			} else if (cpuTries == 0 && (playerChoice < range[0] || playerChoice > range[1])) {
+				System.out.println("Gracz wgrał poprzez oszustwo");
+			}
 		}
-		
-
 	}
-	
+
 	static int[] cpuRange(String command, int[] range, int result) {
 		int[] newRange = new int[2];
 		switch (command) {
@@ -62,16 +66,16 @@ public class Main3 {
 			break;
 		}
 		return newRange;
-		
+
 	}
-	
+
 	static int cpuTry(int min, int max) {
-		
+
 		Random r = new Random();
-		int result = r.nextInt(max - min)+min;
+		int result = r.nextInt(max+1 - min)+min;
 		System.out.println("Wylosowano: " + result);
 		return result;
-		
+
 	}
 
 	static boolean rangeCheckV1(int a) {
@@ -100,7 +104,7 @@ public class Main3 {
 		return scan.nextInt();
 
 	}
-	
+
 	static String scanTextV2() {
 
 		Scanner scan = new Scanner(System.in);
@@ -108,7 +112,7 @@ public class Main3 {
 		while(true) {
 			if (temp.equals("Za mało")) {
 				break;
-			} else if (temp.equalsIgnoreCase("Za dużo")) {
+			} else if (temp.equals("Za dużo")) {
 				break;
 			} else if (temp.equals("Trafiłeś")) {
 				break;
@@ -119,6 +123,6 @@ public class Main3 {
 		}
 		return temp;
 	}
-	
 
 }
+// done - można zmodyfikować kod tak aby nie losował po raz drugi tej samej liczby

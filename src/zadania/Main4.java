@@ -33,6 +33,8 @@ Typy kostek występujące w grach: D3, D4, D6, D8, D10, D12, D20, D100.
 
 package zadania;
 
+import java.util.Scanner;
+
 public class Main4 {
 
 	public static void main(String[] args) {
@@ -42,11 +44,28 @@ public class Main4 {
 		int y = 0;
 		int z = 0;
 		char mod = '+';
+		String code = "";
+
+		System.out.println("Podaj liczbę rzutów");
+		x = scannerV1();
 		
-		System.out.println(DiceCode(2, 3, 1, '+')); // test generatora kodu
+		System.out.println("Wprowadź liczbę ścian kości z wymienionych poniżej:\n"
+				+ "3, 4, 6, 8, 10, 12, 20, 100");
+		y = diceChecker();
+		
+		System.out.println("Wprowadź symbol modyfikatora rzutu lub 0 by pominąć ten krok:");
+		mod = throwMod();
+		
+		if (mod != '0') {
+			System.out.println("Podaj wartość o jaką rzut zostanie zmodyfikowany:");
+			z = scannerV1();
+		}
+		
+		System.out.println("Wynik dla rzutu " + diceCode(x, y, z, mod) + " to: \n");
+		
 	}
 	
-	public static String DiceCode(int x, int y, int z, char mod) {
+	public static String diceCode(int x, int y, int z, char mod) {
 		// generuje kod rzutu - działa
 		StringBuffer generator = new StringBuffer();
 		
@@ -65,8 +84,50 @@ public class Main4 {
 		return result;
 	}
 
-	public static int DiceThrow(String input) {
-		// czyta kod i zwraca wnik rzutu
+	public static int diceThrow(String input) {
+		// czyta kod i zwraca wnik rzutu - do zrobienia
 		return 0;
+	}
+	
+	public static int scannerV1() {
+
+		Scanner scan = new Scanner(System.in);
+
+		while (!scan.hasNextInt()) {
+			System.out.println("Wproadzono niedozwolone znaki, spróbuj ponownie: ");
+			scan.next();
+		}
+		return scan.nextInt();
+
+	}
+	
+	public static int diceChecker() {
+//		sprawdza czy wprowadzono poprawną liczbę ścian - działa
+		int dice = scannerV1();
+		while (true) {
+			if (dice == 3 ||
+				dice == 4 ||
+				dice == 6 ||
+				dice == 8 ||
+				dice == 10 ||
+				dice == 12 ||
+				dice == 20 ||
+				dice == 100) {
+					return dice;
+			} else {
+				System.out.println("Niestety kość o takiej liczbie ścian nie istnieje, spróbuj ponownie: ");
+				dice = scannerV1();
+			}
+		}
+	}
+	
+	public static char throwMod() {
+		Scanner scan = new Scanner(System.in);
+		
+		while(!scan.hasNext("[-+/*0]")) {
+			scan.next();
+			System.out.println("Wprowadź poprawny symbol działania matematycznego");
+		}
+		return scan.next().charAt(0);
 	}
 }
