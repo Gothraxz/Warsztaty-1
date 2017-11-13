@@ -33,7 +33,9 @@ Typy kostek występujące w grach: D3, D4, D6, D8, D10, D12, D20, D100.
 
 package zadania;
 
+import java.util.Random;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Main4 {
 
@@ -61,7 +63,9 @@ public class Main4 {
 			z = scannerV1();
 		}
 		
-		System.out.println("Wynik dla rzutu " + diceCode(x, y, z, mod) + " to: \n");
+		code = diceCode(x, y, z, mod);
+		
+		System.out.println("Wynik dla rzutu " + code + " to: \n" + diceThrow(code));
 		
 	}
 	
@@ -85,8 +89,90 @@ public class Main4 {
 	}
 
 	public static int diceThrow(String input) {
-		// czyta kod i zwraca wnik rzutu - do zrobienia
-		return 0;
+		// czyta kod i zwraca wnik rzutu - do zrobienia dzielenie kodu rzutu na wartości, 
+		// wiersz 131 wychodzi poza zakres
+		int result = 0;
+		Random rand = new Random();
+		
+		System.out.println("Wczytano kod: " + input);
+		
+		StringBuilder build = new StringBuilder();
+		
+		String throwNum = "";
+		String diceType = "";
+		char throwMod = '0';
+		String modNum = "";
+		int i = 0;
+		int index = 0;
+		
+		if (Character.isDigit(input.charAt(0))) {
+			while (Character.isDigit(input.charAt(i))) {
+				build.append(input.charAt(i));
+				i++;
+				index = i+1;
+			}
+			throwNum = build.toString();
+		} else {
+			throwNum = "1";
+		}
+		
+		build.delete(0, i);
+		
+		while (Character.isDigit(input.charAt(index))) {
+			build.append(input.charAt(index));
+			index++;
+			i = index+1;
+		}
+		
+		diceType = build.toString();
+		build.delete(0, index);
+		
+		if (!Character.isAlphabetic(input.charAt(i))) {
+			throwMod = input.charAt(i);
+			while (Character.isDigit(input.charAt(i+1))) {
+				build.append(input.charAt(i+1));
+				i++;
+			}
+			modNum = build.toString();
+		}
+		
+		if (throwMod != '0') {
+			System.out.println("Dla kodu " + throwNum + 'D' + diceType + throwMod + modNum + " wynik wynosi:");
+		} else {
+			System.out.println("Dla kodu " + throwNum + 'D' + diceType + " wynik wynosi:");
+		}
+		
+		if (Integer.parseInt(throwNum) > 1 && throwMod == '0') {
+			for (int j = 0; j < Integer.parseInt(throwNum); j++) {
+				result =+ rand.nextInt(Integer.parseInt(diceType+1));
+			}
+		} else if (Integer.parseInt(throwNum) > 1 && throwMod != '0') {
+			for (int j = 0; j < Integer.parseInt(throwNum); j++) {
+				if (throwMod == '+') {
+					result = rand.nextInt(Integer.parseInt(diceType+1)) + Integer.parseInt(modNum);
+				} else if (throwMod == '-') {
+					result = rand.nextInt(Integer.parseInt(diceType+1)) - Integer.parseInt(modNum);
+				} else if (throwMod == '*') {
+					result = rand.nextInt(Integer.parseInt(diceType+1)) * Integer.parseInt(modNum);
+				} else if (throwMod == '/') {
+					result = rand.nextInt(Integer.parseInt(diceType+1)) / Integer.parseInt(modNum);
+				}
+			}
+		} else if (Integer.parseInt(throwNum) <= 1 && throwMod == '0') {
+			result = rand.nextInt(Integer.parseInt(diceType+1));
+		} else if (Integer.parseInt(throwNum) <= 1 && throwMod != '0') {
+			if (throwMod == '+') {
+				result = rand.nextInt(Integer.parseInt(diceType+1)) + Integer.parseInt(modNum);
+			} else if (throwMod == '-') {
+				result = rand.nextInt(Integer.parseInt(diceType+1)) - Integer.parseInt(modNum);
+			} else if (throwMod == '*') {
+				result = rand.nextInt(Integer.parseInt(diceType+1)) * Integer.parseInt(modNum);
+			} else if (throwMod == '/') {
+				result = rand.nextInt(Integer.parseInt(diceType+1)) / Integer.parseInt(modNum);
+			}
+		}
+		
+		return result;
 	}
 	
 	public static int scannerV1() {
