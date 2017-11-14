@@ -70,7 +70,7 @@ public class Main4 {
 	}
 	
 	public static String diceCode(int x, int y, int z, char mod) {
-		// generuje kod rzutu - działa
+		
 		StringBuffer generator = new StringBuffer();
 		
 		if (x > 1) {
@@ -90,7 +90,9 @@ public class Main4 {
 
 	public static int diceThrow(String input) {
 		// czyta kod i zwraca wnik rzutu - do zrobienia dzielenie kodu rzutu na wartości, 
-		// wiersz 131 wychodzi poza zakres
+		// wiersz 135 wychodzi poza zakres (nie czyta modyfikatora)
+		// do poprawy mechanizm losowania
+		int codeLength = input.length();
 		int result = 0;
 		Random rand = new Random();
 		
@@ -109,32 +111,38 @@ public class Main4 {
 			while (Character.isDigit(input.charAt(i))) {
 				build.append(input.charAt(i));
 				i++;
-				index = i+1;
 			}
 			throwNum = build.toString();
 		} else {
 			throwNum = "1";
 		}
-		
+
+		index = i + 1;
 		build.delete(0, i);
 		
-		while (Character.isDigit(input.charAt(index))) {
+		while (index < codeLength && Character.isDigit(input.charAt(index))) {
 			build.append(input.charAt(index));
 			index++;
-			i = index+1;
 		}
 		
 		diceType = build.toString();
 		build.delete(0, index);
 		
-		if (!Character.isAlphabetic(input.charAt(i))) {
+		i = index; // źle liczy zmienną i
+
+		if (!Character.isLetterOrDigit(input.charAt(i))) {
 			throwMod = input.charAt(i);
-			while (Character.isDigit(input.charAt(i+1))) {
+			i++;
+			while (i < codeLength && Character.isDigit(input.charAt(i+1))) {
 				build.append(input.charAt(i+1));
 				i++;
 			}
 			modNum = build.toString();
 		}
+		
+		System.out.println("throwMod: " + throwMod);
+		System.out.println("i: " + i);
+		System.out.println("index: " + index);
 		
 		if (throwMod != '0') {
 			System.out.println("Dla kodu " + throwNum + 'D' + diceType + throwMod + modNum + " wynik wynosi:");
