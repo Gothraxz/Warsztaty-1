@@ -33,6 +33,7 @@ Typy kostek występujące w grach: D3, D4, D6, D8, D10, D12, D20, D100.
 
 package zadania;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -48,7 +49,7 @@ public class Main4 {
 		char mod = '+';
 		String code = "";
 
-		System.out.println("Podaj liczbę rzutów");
+		System.out.println("Podaj liczbę rzutów:");
 		x = scannerV1();
 		
 		System.out.println("Wprowadź liczbę ścian kości z wymienionych poniżej:\n"
@@ -65,7 +66,7 @@ public class Main4 {
 		
 		code = diceCode(x, y, z, mod);
 		
-		System.out.println("Wynik dla rzutu " + code + " to: \n" + diceThrow(code));
+		System.out.println("Wynik dla rzutu " + code + " to: \n" + diceThrowV2(code));
 		
 	}
 	
@@ -88,96 +89,74 @@ public class Main4 {
 		return result;
 	}
 
-	public static int diceThrow(String input) {
-		// czyta kod i zwraca wnik rzutu - do zrobienia dzielenie kodu rzutu na wartości, 
-		// wiersz 135 wychodzi poza zakres (nie czyta modyfikatora)
-		// do poprawy mechanizm losowania
-		int codeLength = input.length();
+	public static int diceThrowV2(String input) {
+		
+		StringTokenizer split = new StringTokenizer(input, "Dd*-/+", true);
+		String[] diceCode = new String[split.countTokens()];
+		int throwNum = 0;
+		int diceNum = 0;
+		char modType = '0';
+		int modNum = 0;
 		int result = 0;
 		Random rand = new Random();
 		
-		System.out.println("Wczytano kod: " + input);
+		for (int i = 0; i < diceCode.length; i++) {
+			diceCode[i] = split.nextToken().toString();
+		}
 		
-		StringBuilder build = new StringBuilder();
+		switch (diceCode.length) {
 		
-		String throwNum = "";
-		String diceType = "";
-		char throwMod = '0';
-		String modNum = "";
-		int i = 0;
-		int index = 0;
-		
-		if (Character.isDigit(input.charAt(0))) {
-			while (Character.isDigit(input.charAt(i))) {
-				build.append(input.charAt(i));
-				i++;
+		case 2: // D6
+			diceNum = Integer.parseInt(diceCode[1]);
+			
+			result = rand.nextInt(diceNum)+1;
+			break;
+			
+		case 3: // 2D6
+			throwNum = Integer.parseInt(diceCode[0]);
+			diceNum = Integer.parseInt(diceCode[2]);
+			
+			for (int i = 0; i < throwNum; i++) {
+				result += rand.nextInt(diceNum)+1;				
 			}
-			throwNum = build.toString();
-		} else {
-			throwNum = "1";
-		}
-
-		index = i + 1;
-		build.delete(0, i);
-		
-		while (index < codeLength && Character.isDigit(input.charAt(index))) {
-			build.append(input.charAt(index));
-			index++;
-		}
-		
-		diceType = build.toString();
-		build.delete(0, index);
-		
-		i = index; // źle liczy zmienną i
-
-		if (!Character.isLetterOrDigit(input.charAt(i))) {
-			throwMod = input.charAt(i);
-			i++;
-			while (i < codeLength && Character.isDigit(input.charAt(i+1))) {
-				build.append(input.charAt(i+1));
-				i++;
+			break;
+			
+		case 4: // D6+1
+			diceNum = Integer.parseInt(diceCode[1]);
+			modType = diceCode[2].charAt(0);
+			modNum = Integer.parseInt(diceCode[3]);
+			
+			result = rand.nextInt(diceNum)+1;
+			if (modType == '+') {
+				result += modNum;
+			} else if (modType == '-') {
+				result -= modNum;
+			} else if (modType == '*') {
+				result *= modNum;
+			} else if (modType == '/') {
+				result /= modNum;
 			}
-			modNum = build.toString();
-		}
-		
-		System.out.println("throwMod: " + throwMod);
-		System.out.println("i: " + i);
-		System.out.println("index: " + index);
-		
-		if (throwMod != '0') {
-			System.out.println("Dla kodu " + throwNum + 'D' + diceType + throwMod + modNum + " wynik wynosi:");
-		} else {
-			System.out.println("Dla kodu " + throwNum + 'D' + diceType + " wynik wynosi:");
-		}
-		
-		if (Integer.parseInt(throwNum) > 1 && throwMod == '0') {
-			for (int j = 0; j < Integer.parseInt(throwNum); j++) {
-				result =+ rand.nextInt(Integer.parseInt(diceType+1));
-			}
-		} else if (Integer.parseInt(throwNum) > 1 && throwMod != '0') {
-			for (int j = 0; j < Integer.parseInt(throwNum); j++) {
-				if (throwMod == '+') {
-					result = rand.nextInt(Integer.parseInt(diceType+1)) + Integer.parseInt(modNum);
-				} else if (throwMod == '-') {
-					result = rand.nextInt(Integer.parseInt(diceType+1)) - Integer.parseInt(modNum);
-				} else if (throwMod == '*') {
-					result = rand.nextInt(Integer.parseInt(diceType+1)) * Integer.parseInt(modNum);
-				} else if (throwMod == '/') {
-					result = rand.nextInt(Integer.parseInt(diceType+1)) / Integer.parseInt(modNum);
+			break;
+			
+		case 5: // 2D6+1
+			throwNum = Integer.parseInt(diceCode[0]);
+			diceNum = Integer.parseInt(diceCode[2]);
+			modType = diceCode[3].charAt(0);
+			modNum = Integer.parseInt(diceCode[4]);
+			
+			for (int i = 0; i < throwNum; i++) {
+				result += rand.nextInt(diceNum)+1;
+				if (modType == '+') {
+					result += modNum;
+				} else if (modType == '-') {
+					result -= modNum;
+				} else if (modType == '*') {
+					result *= modNum;
+				} else if (modType == '/') {
+					result /= modNum;
 				}
 			}
-		} else if (Integer.parseInt(throwNum) <= 1 && throwMod == '0') {
-			result = rand.nextInt(Integer.parseInt(diceType+1));
-		} else if (Integer.parseInt(throwNum) <= 1 && throwMod != '0') {
-			if (throwMod == '+') {
-				result = rand.nextInt(Integer.parseInt(diceType+1)) + Integer.parseInt(modNum);
-			} else if (throwMod == '-') {
-				result = rand.nextInt(Integer.parseInt(diceType+1)) - Integer.parseInt(modNum);
-			} else if (throwMod == '*') {
-				result = rand.nextInt(Integer.parseInt(diceType+1)) * Integer.parseInt(modNum);
-			} else if (throwMod == '/') {
-				result = rand.nextInt(Integer.parseInt(diceType+1)) / Integer.parseInt(modNum);
-			}
+			break;
 		}
 		
 		return result;
@@ -196,7 +175,7 @@ public class Main4 {
 	}
 	
 	public static int diceChecker() {
-//		sprawdza czy wprowadzono poprawną liczbę ścian - działa
+		
 		int dice = scannerV1();
 		while (true) {
 			if (dice == 3 ||
@@ -225,3 +204,4 @@ public class Main4 {
 		return scan.next().charAt(0);
 	}
 }
+// done
