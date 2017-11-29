@@ -19,15 +19,17 @@ try {
 
 ````
 3. Wywołaj pobieranie dla wybranych serwisów internetowych.
-4. Wczytaj utworzony plik `popular_words.txt` i na jego podstawie utwórz plik `most_popular_words.txt`,
- który zawierać będzie 10 najbardziej popularnych słów.
-5. Utwórz tablicę elementów wykluczonych np. **i**, **lub** , ewentualnie pomiń wszystkie elementy 3-znakowe. 
+4. Wczytaj utworzony plik `popular_words.txt` i na jego podstawie utwórz plik 
+`most_popular_words.txt`, który zawierać będzie 10 najbardziej popularnych słów.
+5. Utwórz tablicę elementów wykluczonych np. **i**, **lub** , 
+ewentualnie pomiń wszystkie elementy 3-znakowe. 
 */
 
 package zadania;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -63,23 +66,87 @@ public class Main5 {
 	}
 	
 	public static void wordsReader(Path path) {
-		
-		List<String> allWords = new ArrayList<>();
-		
+
+		String allWords = "";
+
 		try {
-			allWords = Files.readAllLines(path);
+			allWords = Files.readAllLines(path).toString().toLowerCase();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		StringTokenizer tok = new StringTokenizer(allWords, " _-=+,.!?;:[]()&1234567890\"\'");
+
+		String[] ban = {"i", "lub", "oraz", "a", "także", "w", "od", "do", "aż", "za", "o", "się", 
+				"nad", "ws", "na", "z", "to", "ma", "że", "tam", "co", "będą", "będzie", "jest", 
+				"aby", "ale"};
+
+		ArrayList<String> words = new ArrayList<>();
+		String[] temp = new String[tok.countTokens()];
+
+		int tempI = 0;
+		while (tok.hasMoreTokens()) {
+			temp[tempI] = tok.nextToken();
+			tempI++;
+		}
+
+		for (int i = 0; i < temp.length; i++) {
+			boolean wordExist = false;
+			boolean wordIsBanned = false;
+
+			for (int j = 0; j < words.size(); j++) {
+				if (words.get(j).toString().equals(temp[i])) {
+					wordExist = true;
+					break;
+				}
+			}
+			
+			for (int k = 0; k < ban.length; k++) {
+				if (temp[i].equalsIgnoreCase(ban[k]) || temp[i].length() < 2) {
+					wordIsBanned = true;
+				}
+			}
+
+			if (wordExist == false && wordIsBanned == false) {
+				words.add(temp[i]);
+			}
+
+		}
 		
-		// działa do momemtu uzupełnienia listy
-		// dopisać filtorwanie listy i usunięcie niepotrzebnych znaków oraz krótkich słów
-		// poniżej test listy
-//		for (int i = 0; i < allWords.size(); i++) {
-//			System.out.println(allWords.get(i));
-//		}
+		words.sort(null);
+
+		String[][] result = new String[words.size()][words.size()];
+		int[] resultCount = new int[words.size()];
+
+		for (int i = 0; i < result.length; i++) {
+			result[i][0] = words.get(i);
+		}
+		
+		Arrays.fill(resultCount, 0);
+		
+		for (int i = 0; i < resultCount.length; i++) {
+			for (int j = 0; j < temp.length; j++) {
+				if (result[i][0].equals(temp[j])) {
+					resultCount[i]++;
+				}
+			}
+		}
+		
+		for (int i = 0; i < result.length; i++) {
+			result[i][1] = resultCount[i]+"";
+		}
+
+		
+		// test
+		for (int i = 0; i < result.length; i++) {
+			System.out.println(result[i][0] + ": " + result[i][1]);
+		}
+		
+		// posortować tablicę oraz zapisać 10 wyników do kolejnego pliku
 		
 	}
+		
+	
 	
 	public static void fileCreator(Path path) {
 		
