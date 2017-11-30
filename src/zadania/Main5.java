@@ -56,16 +56,20 @@ public class Main5 {
 		
 		String link = "http://www.onet.pl/";
 		
+		String[] ban = {"lub", "oraz", "także", "od", "do", "aż", "za", "się", 
+				"nad", "ws", "na", "to", "ma", "że", "tam", "co", "będą", "będzie", "jest", 
+				"aby", "ale", "są"};
+		
 		fileCreator(pathOne);
 		fileCreator(pathTwo);
 		
 		importData(pathOne, link);
 		
-		wordsReader(pathOne);
+		wordsReader(pathOne, pathTwo, link, ban);
 		
 	}
 	
-	public static void wordsReader(Path path) {
+	public static void wordsReader(Path path, Path path2, String link, String[] ban) {
 
 		String allWords = "";
 
@@ -75,11 +79,11 @@ public class Main5 {
 			e.printStackTrace();
 		}
 
-		StringTokenizer tok = new StringTokenizer(allWords, " _-=+,.!?;:[]()&1234567890\"\'");
+		StringTokenizer tok = new StringTokenizer(allWords, " _-=+,.!?;:[]()&1234567890„\"\'");
 
-		String[] ban = {"i", "lub", "oraz", "a", "także", "w", "od", "do", "aż", "za", "o", "się", 
-				"nad", "ws", "na", "z", "to", "ma", "że", "tam", "co", "będą", "będzie", "jest", 
-				"aby", "ale"};
+//		String[] ban = {"lub", "oraz", "także", "od", "do", "aż", "za", "się", 
+//				"nad", "ws", "na", "to", "ma", "że", "tam", "co", "będą", "będzie", "jest", 
+//				"aby", "ale", "są"};
 
 		ArrayList<String> words = new ArrayList<>();
 		String[] temp = new String[tok.countTokens()];
@@ -136,17 +140,41 @@ public class Main5 {
 			result[i][1] = resultCount[i]+"";
 		}
 
+		int[] tenHighest = new int[10];
+		int max = 0;
+		int index = 0;
 		
-		// test
-		for (int i = 0; i < result.length; i++) {
-			System.out.println(result[i][0] + ": " + result[i][1]);
+		for (int i = 0; i < 10; i++) {
+			max = resultCount[0];
+			for (int j = 1; j < resultCount.length; j++) {
+				if (max < resultCount[j]) {
+					max = resultCount[j];
+					index = j;
+				}
+			}
+			tenHighest[i] = index;
+			resultCount[index] = Integer.MIN_VALUE;
+			
 		}
 		
-		// posortować tablicę oraz zapisać 10 wyników do kolejnego pliku
+		try {
+			Files.write(path2, ("Najpopularniejsze słowa z portalu " + link 
+					+ " wraz z liczbą wystąpień:\n\n").getBytes(), StandardOpenOption.APPEND);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+		for (int i = 0; i < tenHighest.length; i++) {
+			String line = result[tenHighest[i]][0] + ": " + result[tenHighest[i]][1] + "\n";
+			try {
+				Files.write(path2, line.getBytes(), StandardOpenOption.APPEND);
+				System.out.print("Dodano: " + line);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
 	}
-		
-	
 	
 	public static void fileCreator(Path path) {
 		
@@ -181,3 +209,4 @@ public class Main5 {
 	}
 
 }
+//done
